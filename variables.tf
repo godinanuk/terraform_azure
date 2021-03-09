@@ -8,7 +8,12 @@ variable "location" {
    default = "eastus"
 }
 
-variable "fs_cidr" {
-   description = "CIDR of FS network"
+variable "fs_hub_cidr" {
+   description = "CIDR of FS HUB network"
+   default = "10.0.0.0/16"
+}
+
+variable "fs_spoke100_cidr" {
+   description = "CIDR of FS SPOKE 1 network"
    default = "10.10.0.0/16"
 }

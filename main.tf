@@ -3,7 +3,7 @@ resource "azurerm_resource_group" "vm_rg" {
   location = var.location
   tags = {
     Environment = var.prefix
-    function    = "Full Stack Resource Group"
+    function    = "Full Stack VM Resource Group"
   }
 }
 
@@ -13,7 +13,7 @@ module "db-vm" {
   location = var.location 
   prefix = var.prefix
   resource_group_name = azurerm_resource_group.vm_rg.name
-  subnet_id           = module.fs_vnet.subnet_id[1]
+  subnet_id           = module.fs_spoke100_vnet.subnet_id[0]
   tags = {
     Environment = var.prefix
     function    = "DB VM"
@@ -26,10 +26,23 @@ module "web-vm" {
   location = var.location
   prefix = var.prefix
   resource_group_name = azurerm_resource_group.vm_rg.name
-  subnet_id           = module.fs_vnet.subnet_id[1]
+  subnet_id           = module.fs_spoke100_vnet.subnet_id[0]
   tags = {
     Environment = var.prefix
     function    = "WEB VM"
+  }
+}
+
+module "jumpbox-vm" {
+  source = "./modules/vm-linux-latest"
+  vm_name = "jumpbox-vm"
+  location = var.location
+  prefix = var.prefix
+  resource_group_name = module.fs_hub_vnet.vnet_rg 
+  subnet_id           = module.fs_hub_vnet.subnet_id[1]
+  tags = {
+    Environment = var.prefix
+    function    = "JUMPBOX VM"
   }
 }
 
@@ -39,4 +52,8 @@ output "dbvm_pip" {
 
 output "webvm_pip" {
  value = module.web-vm.public_ip
+}
+
+output "jumpvm_pip" {
+ value = module.jumpbox-vm.public_ip
 }
